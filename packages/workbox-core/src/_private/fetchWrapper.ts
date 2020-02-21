@@ -86,12 +86,12 @@ const wrappedFetch = async ({
     for (const plugin of plugins) {
       if (pluginEvents.REQUEST_WILL_FETCH in plugin) {
         const pluginMethod = plugin[pluginEvents.REQUEST_WILL_FETCH]!;
-        const requestClone = request.clone();
+        const requestClone: Request = request.clone();
 
         request = await pluginMethod.call(plugin, {
           request: requestClone,
           event,
-        }) as Request;
+        });
 
         if (process.env.NODE_ENV !== 'production') {
           if (request) {

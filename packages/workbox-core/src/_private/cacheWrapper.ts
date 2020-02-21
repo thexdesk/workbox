@@ -1,6 +1,5 @@
 /*
   Copyright 2018 Google LLC
-
   Use of this source code is governed by an MIT-style
   license that can be found in the LICENSE file or at
   https://opensource.org/licenses/MIT.
@@ -17,15 +16,15 @@ import {WorkboxPlugin} from '../types.js';
 
 import '../_version.js';
 
-interface MatchWrapperOptions {
+export interface MatchWrapperOptions {
   cacheName: string;
   request: Request;
-  event?: Event;
+  event?: ExtendableEvent;
   plugins?: WorkboxPlugin[];
   matchOptions?: CacheQueryOptions;
 }
 
-interface PutWrapperOptions extends MatchWrapperOptions {
+export interface PutWrapperOptions extends MatchWrapperOptions {
   response: Response;
 }
 
@@ -33,6 +32,7 @@ interface GetEffectiveRequestOptions {
   request: Request;
   mode: string;
   plugins?: WorkboxPlugin[];
+  event?: ExtendableEvent;
 }
 
 /**
@@ -54,6 +54,7 @@ const _getEffectiveRequest = async ({
   request,
   mode,
   plugins = [],
+  event,
 }: GetEffectiveRequestOptions) => {
   const cacheKeyWillBeUsedPlugins = pluginUtils.filter(
       plugins, pluginEvents.CACHE_KEY_WILL_BE_USED);
@@ -61,7 +62,7 @@ const _getEffectiveRequest = async ({
   let effectiveRequest: Request | string = request;
   for (const plugin of cacheKeyWillBeUsedPlugins) {
     effectiveRequest = await plugin[pluginEvents.CACHE_KEY_WILL_BE_USED]!.call(
-        plugin, {mode, request: effectiveRequest});
+        plugin, {mode, request: effectiveRequest, event});
 
     if (typeof effectiveRequest === 'string') {
       effectiveRequest = new Request(effectiveRequest);
@@ -182,7 +183,7 @@ const matchWrapper = async ({
   const cache = await self.caches.open(cacheName);
 
   const effectiveRequest = await _getEffectiveRequest({
-    plugins, request, mode: 'read'});
+    plugins, request, event, mode: 'read'});
 
   let cachedResponse = await cache.match(effectiveRequest, matchOptions);
   if (process.env.NODE_ENV !== 'production') {
@@ -290,8 +291,12 @@ const putWrapper = async ({
       plugins, pluginEvents.CACHE_DID_UPDATE);
 
   const oldResponse = updatePlugins.length > 0 ?
-      await matchWrapper({cacheName, matchOptions, request: effectiveRequest}) :
-      null;
+      await matchWrapper({
+        cacheName,
+        matchOptions,
+        event,
+        request: effectiveRequest,
+      }) : null;
 
   if (process.env.NODE_ENV !== 'production') {
     logger.debug(`Updating the '${cacheName}' cache with a new Response for ` +
