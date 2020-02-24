@@ -37,7 +37,7 @@ export const spyOnEvent = (event) => {
       promises.push(Promise.resolve(responseOrPromise));
 
       // TODO(philipwalton): we cannot currently call the native
-      // `respondWith()` due to this bug in Firefix:
+      // `respondWith()` due to this bug in Firefox:
       // https://bugzilla.mozilla.org/show_bug.cgi?id=1538756
       // FetchEvent.prototype.respondWith.call(event, responseOrPromise);
     });
