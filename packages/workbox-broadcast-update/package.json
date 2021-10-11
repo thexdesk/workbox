@@ -27,6 +27,6 @@
   "module": "index.mjs",
   "types": "index.d.ts",
   "dependencies": {
-    "workbox-core": "^5.0.0"
+    "workbox-core": "^5.1.4"
   }
 }
