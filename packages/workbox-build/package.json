@@ -21,7 +21,7 @@
   "homepage": "https://github.com/GoogleChrome/workbox",
   "dependencies": {
     "@babel/core": "^7.8.4",
-    "@babel/preset-env": "^7.8.4",
+    "@babel/preset-env": "^7.22.0",
     "@babel/runtime": "^7.8.4",
     "@hapi/joi": "^15.1.0",
     "@rollup/plugin-node-resolve": "^7.1.1",
